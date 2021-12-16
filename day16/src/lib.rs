@@ -147,7 +147,7 @@ blueprint! {
         }
 
         // Used to display information about your elf NFT
-        pub fn display_info(&self, elves: Bucket) {
+        pub fn display_info(&self, elves: Bucket) -> Bucket {
             assert!(elves.amount() > Decimal::zero(), "Missing NFT !");
             assert!(elves.resource_def() == self.elf_def, "NFT definition not matching");
 
@@ -155,6 +155,7 @@ blueprint! {
                 info!("========");
                 info!("{}", nft.data())
             }
+            elves
         }
 
         // The following methods are used to randomly generate an elf
@@ -232,12 +233,10 @@ blueprint! {
         // Generate a random number
         // WARNING: DON'T USE THIS IN PRODUCTION !
         fn random_number(&mut self, min: i32, max: i32) -> usize {
-            self.random_seed = ( ( 75 * self.random_seed ) + 74 ) % 65537;
+            self.random_seed = ( ( 1664525 * self.random_seed ) + 1013904223 ) % 4294967296;
             let range : u64 = (max - min + 1).try_into().unwrap();
             let shift : u64 = min.try_into().unwrap();
-            let r = (self.random_seed % range + shift).try_into().unwrap();
-            info!("{}", r);
-            r
+            (self.random_seed % range + shift).try_into().unwrap()
         }
     }
 }
